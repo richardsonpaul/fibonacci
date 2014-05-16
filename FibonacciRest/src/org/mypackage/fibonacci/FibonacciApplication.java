@@ -26,7 +26,18 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 @Path("/fibonacci")
 public class FibonacciApplication extends Application {
 
-  public static final int MAXIUMUM_INPUT = 10000;
+  private static final int MAXIMUM_INPUT;
+  static {
+    int defaultMaximum = 100;
+    String configuredMaximum = System.getenv("FIBONACCI_REST_MAXIMUM");
+    int maximumInput;
+    try {
+      maximumInput = Integer.parseInt(configuredMaximum);
+    } catch (Exception _) {
+      maximumInput = defaultMaximum;
+    }
+    MAXIMUM_INPUT = maximumInput;
+  }
 
   public static List<BigInteger> collectFibonacciValues(int n) {
     if (n < 1) {
@@ -45,32 +56,29 @@ public class FibonacciApplication extends Application {
   @GET
   @Path("/{n}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getFibonacciSeries(@PathParam("n") int n) {
-    String errorMessage = validateInput(n);
-    if (errorMessage != null) {
-      return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(
-          error(errorMessage)).build();
-    } else {
-      return Response.status(HttpServletResponse.SC_OK).entity(
-          FibonacciApplication.collectFibonacciValues(n)).build();
+  public static Response getFibonacciSeries(@PathParam("n") int n) {
+    Object error = validateInput(n);
+    if (error != null) {
+      return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(error).build();
     }
+    return Response.status(HttpServletResponse.SC_OK).entity(collectFibonacciValues(n)).build();
   }
 
   /**
-   * Checks for valid range; returns an error message if out of range, null if no error
+   * Checks for valid range; returns an error entity if out of range, null if no error
    * @param n
-   * @return String if error, or null
+   * @return Object describing error, or null
    */
-  private String validateInput(int n) {
+  private static Object validateInput(int n) {
     if (n < 0) {
-      return "Cannot request a fibonacci value of less than zero";
-    } else if (n >= MAXIUMUM_INPUT) {
-      return "Value " + n + " is out of range for this service; maxiumum is " + MAXIUMUM_INPUT;
+      return error("Cannot request a fibonacci value of less than zero");
+    } else if (n > MAXIMUM_INPUT) {
+      return error("Value " + n + " is out of range for this service; maxiumum is " + MAXIMUM_INPUT);
     }
     return null;
   }
 
-  private HashMap<String, String> error(String message) {
+  private static HashMap<String, String> error(String message) {
     HashMap<String, String> error = new HashMap<>();
     error.put("error", message);
     return error;

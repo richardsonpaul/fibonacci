@@ -3,16 +3,15 @@ package org.mypackage.fibonacci;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.math.BigInteger.valueOf;
-import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("static-method")
 public class TestFibonacci {
 
   @Test

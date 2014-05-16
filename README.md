@@ -15,8 +15,8 @@ will return JSON that looks like
 ```
 [0, 1, 1, 2, 3]
 ```
-The maxiumum "n" you can request is 9999 (10,000 is out of range!). If I had more time, I'd have made this a configuration option in the servlet, but for now it's just in the code.
+The maxiumum "n" you can request is configurable by setting an environment variable: FIBONACCI_REST_MAXIMUM. Default maximum is 100.
 
-It actually can calculate a series of 100k or more fairly quickly, but the result is so huge it's just silly.
+It can calculate a series of 100k or more fairly quickly, but the result is so huge it's just silly.
 
 Enjoy
